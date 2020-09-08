@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>One Last Spell - jryzkns 2020</title>
+
+    <!-- Load custom style sheet -->
+    <link rel="stylesheet" type="text/css" href="theme/love.css">
+  </head>
+  <body>
+    <center>
+      <div>
+        <h1>One Last Spell - jryzkns 2020</h1>
+        <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+        <canvas id="loadingCanvas" oncontextmenu="event.preventDefault()" width="1280" height="720"></canvas>
+      </div>
+    </center>
+
+    <script type='text/javascript'>
+      var loadingContext = document.getElementById('loadingCanvas').getContext('2d');
+      function drawLoadingText(text) {
+        var canvas = loadingContext.canvas;
+
+        loadingContext.fillStyle = "rgb(142, 195, 227)";
+        loadingContext.fillRect(0, 0, canvas.scrollWidth, canvas.scrollHeight);
+
+        loadingContext.font = '2em arial';
+        loadingContext.textAlign = 'center'
+        loadingContext.fillStyle = "rgb( 11, 86, 117 )";
+        loadingContext.fillText(text, canvas.scrollWidth / 2, canvas.scrollHeight / 2);
+
+        loadingContext.fillText("jryzkns", canvas.scrollWidth / 2, canvas.scrollHeight / 4 * 3);
+      }
+
+      window.addEventListener("keydown", function(e) {
+        // space and arrow keys
+        if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+          e.preventDefault();
+        }
+      }, false);
+
+      var Module = {
+        arguments: ['./'],
+        printErr: console.error.bind(console),
+        canvas: (function() {
+          var canvas = document.getElementById('canvas');
+
+          // As a default initial behavior, pop up an alert when webgl context is lost. To make your
+          // application robust, you may want to override this behavior before shipping!
+          // See http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15.2
+          canvas.addEventListener("webglcontextlost", function(e) { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
+
+          return canvas;
+        })(),
+        setStatus: function(text) {
+          if (text) {
+            drawLoadingText(text);
+          } else if (Module.didSyncFS && Module.remainingDependencies === 0) {
+            Module.callMain(Module.arguments);
+            document.getElementById('loadingCanvas').style.display = 'none';
+            document.getElementById('canvas').style.display = 'block';
+          }
+        },
+        didSyncFS: false,
+        totalDependencies: 0,
+        remainingDependencies: 0,
+        monitorRunDependencies: function(left) {
+          this.remainingDependencies = left;
+          this.totalDependencies = Math.max(this.totalDependencies, left);
+          Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+        }
+      };
+      Module.setStatus('Downloading...');
+      window.onerror = function(event) {
+        // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
+        Module.setStatus('Exception thrown, see JavaScript console');
+        Module.setStatus = function(text) {
+          if (text) Module.printErr('[post-exception status] ' + text);
+        };
+      };
+    </script>
+    <script type="text/javascript" src="game.js"></script>
+    <script async type="text/javascript" src="love.js"></script>
+
+    <p>The master villain trapped you and your band of wizards in a never-ending circular realm! Everyone got sealed into a crystal! Luckily for you, despite being sealed up you could still control your wand to traverse this realm. Using your handy wand you can activate crystals sealing other wizards, when there are enough activated crystals, everyone could use their power together to create a powerful burst that destroyed the realm and frees everyone. This burst might be so powerful that it will consume some of the people in the band, but for the greater good of everyone it needs to be done, to cast one last spell that could mean their demise. </p>
+
+    <h3>How to Play:</h3>
+    <ul>
+      <li>use the wasd keys to move the wand</li>
+      <li>when the wand is pressing against a crystal (moving against it), press space-bar to activate it</li>
+      <li>however, if there was a crystal at the same position that is already activated in a different layer, then the activated force from the other crystal will destroy the one that you just tried to activate!</li>
+    </ul>
+
+    <footer>
+      <p>By <a href="https://github.com/jryzkns">jryzkns</a>, built with <a href="https://github.com/TannerRogalsky/love.js">love.js</a></p>
+    </footer>
+  </body>
+</html>
