@@ -1,0 +1,69 @@
+perl = {};perl.xdim,perl.ydim = 0,0;perl.xscale,perl.yscale = 1200,600;perl.boxsizex,perl.boxsizey = 0,0;perl.meteor_n = 1000;perl.flow_speed = 15;perl.internal_counter = 0
+function love.load() love.window.setTitle("Perline - jryzkns 2018");love.window.setMode(1200,600);perl:getDims(1200,600);perl:init() end
+function love.update(dt) perl:update(dt,math.floor(dt*60)) end
+function love.keypressed(key,scancode,isrepeat) perl:keypressed(key,scancode,isrepeat) end
+function norm(vec) local SS = 0;for _,entry in pairs(vec) do SS = SS + entry^2 end;return math.sqrt(SS) end
+function dot(v1,v2) local dotprod = 0;for i=1,#v1 do dotprod = dotprod + v1[i]*v2[i] end;return dotprod end
+function subtract(v1,v2) local vec = getmat(1,#v1);for i=1,#v1 do vec[i] = v1[i] - v2[i] end;return vec end
+function add(v1,v2) local vec = getmat(1,#v1);for i=1,#v1 do vec[i] = v1[i] + v2[i] end;return vec end
+function mat_normalize(mat) local max, min = 0, 0;local normalized = getmat(table.getn(mat),table.getn(mat[1]));for i=1,table.getn(mat) do for j=1,table.getn(mat[1]) do if mat[i][j] > max then max = mat[i][j] end; if mat[i][j] < min then min = mat[i][j] end end end;local range = max - min;for i=1,#mat do for j=1,#mat[1] do normalized[i][j] = (mat[i][j] - min)/range end end;return normalized end
+function getmat(r,c) local mat = {};for i=1,r do mat[i] = {} for j=1,c do mat[i][j] = 0 end end;return mat end
+function normalize(v) local normalized_v = getmat(1,#v);local vnorm = norm(v);for i=1,#v do normalized_v[i] = v[i]/vnorm end;return normalized_v end
+local canonicals = {{0,-1},{math.sqrt(2)/2,-math.sqrt(2)/2},{1,0},{math.sqrt(2)/2,math.sqrt(2)/2},{0,1},{-math.sqrt(2)/2,math.sqrt(2)/2},{-1,0},{-math.sqrt(2)/2,-math.sqrt(2)/2} }
+function perl:init()
+        perl.grid = getmat( math.floor(perl.xdim/perl.xscale) + 1, math.floor(perl.ydim/perl.yscale) + 1 );perl:reset()
+        perl.meteors = getmat(perl.meteor_n,1);for i = 1,#perl.meteors do perl.meteors[i] = perl:newStar() end
+end
+function perl:newStar() local new_star = {};new_star.x, new_star.y = math.random()*perl.xdim,math.random()*perl.ydim;new_star.xp, new_star.yp = new_star.x, new_star.y;return new_star end
+function perl:getNoise(x,y)
+        
+        local heads_x, heads_y = math.floor(x/perl.xscale), math.floor(y/perl.yscale)
+        local tails_x = perl:ease(x - heads_x*perl.xscale)
+        local tails_y = perl:ease(y - heads_y*perl.yscale)
+        
+        local A = normalize({tails_x,tails_y})
+        local B = normalize({tails_x-perl.boxsizex, tails_y})
+        local C = normalize({tails_x,tails_y - perl.boxsizey})
+        local D = normalize({tails_x-perl.boxsizex,tails_y-perl.boxsizey})
+        
+        local del_A = dot(A, perl.grid[heads_x+1][heads_y+1])
+        local del_B = dot(B, perl.grid[heads_x+2][heads_y+1])
+        local del_C = dot(C, perl.grid[heads_x+1][heads_y+2])
+        local del_D = dot(D, perl.grid[heads_x+2][heads_y+2])
+        
+        return (del_A+del_B+del_C+del_D)/4
+end
+function perl:getDims(w,h) perl.xdim, perl.ydim = w, h; perl.boxsizex, perl.boxsizey = perl.xdim/perl.xscale, perl.ydim/perl.yscale end
+function perl:keypressed(key,scancode,isrepeat)
+        if key == "a" then perl:reset()
+        elseif key == "up" then perl.flow_speed = perl.flow_speed + 1
+        elseif key == "down" then perl.flow_speed = perl.flow_speed - 1
+        end
+end
+function perl:distributeGradients() for i = 1,#perl.grid do for j = 1,#perl.grid[i] do perl.grid[i][j] = perl:getRandomUnit() end end end
+function perl:ease(t) return (t * t * t * (t * (t * 6 - 15) + 10)) end
+function perl:reset() perl:distributeGradients();math.randomseed(os.time());scene = love.graphics.newCanvas(perl.xdim,perl.ydim);perl.internal_counter = 0 end
+function perl:getRandomUnit() local direction = math.random()*2*math.pi;return {math.cos(direction), math.sin(direction)} end
+function perl:update(dt,frames)
+        for i,_ in pairs(perl.meteors) do
+                local step_direction = perl:getNoise(perl.meteors[i].x,perl.meteors[i].y)*2*math.pi
+                perl.meteors[i].xp, perl.meteors[i].yp = perl.meteors[i].x, perl.meteors[i].y
+                perl.meteors[i].x = perl.meteors[i].xp + perl.flow_speed * math.cos(step_direction)
+                perl.meteors[i].y = perl.meteors[i].yp + perl.flow_speed * math.sin(step_direction)
+                if (    (perl.meteors[i].x < 0) or (perl.meteors[i].x > perl.xdim) or 
+                (perl.meteors[i].y < 0) or (perl.meteors[i].y > perl.ydim)
+                ) then perl.meteors[i] = perl:newStar() end
+        end
+
+        love.graphics.setCanvas(scene)
+        love.graphics.setColor(perl.internal_counter/1000*255,perl.internal_counter/100*255,perl.internal_counter/10*255,30)
+        for _,star in pairs(perl.meteors) do love.graphics.line(star.x,star.y,star.xp,star.yp) end
+        love.graphics.setCanvas()
+        perl.internal_counter = perl.internal_counter + 1
+end
+
+function love.draw()
+        love.graphics.setColor(255,255,255,255)
+        love.graphics.draw(scene)
+        love.graphics.printf("Perline - jryzkns 2018",0,0,500,"left") 
+end
