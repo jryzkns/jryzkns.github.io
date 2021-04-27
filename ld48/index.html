@@ -1,5 +1,33 @@
 <!DOCTYPE html>
 
+<style>
+    body {
+        background-color: rgb(220, 249, 231);
+        background-size: 100% 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        font-family:'Courier New';
+    }
+
+</style>
+
+<script>
+    var snd = new Audio("sfx_honk.ogg"); 
+</script>
+
 <html>  
-    <a href='GooseRoot.exe'>Download</a>
+
+    <head>
+        <link rel="icon" href="berry_1.ico">
+        <title>LD48 Jam : Goose Root - Jack and Kitty</title>
+    </head>
+    <body>
+        <div>
+            <img src="website_splash.png">
+            <a href='GooseRoot.exe' onclick="snd.play()"><img src="download_button.png"></a>
+            <h3>Visit us on our <a target="_blank" href = "https://ldjam.com/events/ludum-dare/48/goose-root">LD48 page!</a></h3>
+        </div>
+    </body>
 </html>
