@@ -18,7 +18,8 @@
 </style>
 
 <script>
-    var snd = new Audio("sfx_honk.ogg"); 
+    var honk = new Audio("sfx_honk.ogg"); 
+    var honk1 = new Audio("sfx_honk1.ogg"); 
 </script>
 
 <html>  
@@ -32,7 +33,8 @@
             <img src="website_splash.png">
         </div>
         
-        <a href='GooseRoot.exe' onclick="snd.play()"><img src="download_button.png"></a>
+        <a href='GooseRoot.exe' onclick="honk.play()"><img src="download_button.png"></a>
+        <a href='GooseRootPost.exe' onclick="honk1.play()"><img src="download_button2.png"></a>
         
         <h3>Visit us on our <a target="_blank" href = "https://ldjam.com/events/ludum-dare/48/goose-root">LD48 page</a>!</h3>
     </body>
