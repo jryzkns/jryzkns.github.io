@@ -10,11 +10,9 @@
         text-align: center;
         font-family:'Courier New';
     }
-
     img {
         max-width: 100%;
     }
-
 </style>
 
 <script>
@@ -23,19 +21,18 @@
 </script>
 
 <html>  
-
     <head>
         <link rel="icon" href="berry_1.ico">
         <title>LD48 Jam : Goose Root - Jack and Kitty</title>
     </head>
     <body>
         <div>
-            <img src="website_splash.png">
+            <img onContextMenu="return false;" src="website_splash.png">
         </div>
-        
-        <a href='GooseRoot.exe' onclick="honk.play()"><img src="download_button.png"></a>
-        <a href='GooseRootPost.exe' onclick="honk1.play()"><img src="download_button2.png"></a>
-        
+        <div>
+            <a href='GooseRoot.exe' onclick="honk.play()"><img onContextMenu="return false;" src="download_button.png"></a>
+            <a href='GooseRootPost.exe' onclick="honk1.play()"><img onContextMenu="return false;" src="download_button2.png"></a>
+        </div>
         <h3>Visit us on our <a target="_blank" href = "https://ldjam.com/events/ludum-dare/48/goose-root">LD48 page</a>!</h3>
     </body>
 </html>
